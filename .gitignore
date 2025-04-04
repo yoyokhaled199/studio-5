@@ -1,0 +1,8 @@
+# Ignore build and temp folders
+Library/
+Temp/
+Logs/
+
+# Ignore IDE config folders
+.idea/
+.vs/
