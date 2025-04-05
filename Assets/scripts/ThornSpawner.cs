@@ -7,22 +7,24 @@ public class ThornSpawner : MonoBehaviour
     public GameObject thornPrefab; // Thorn prefab reference
 
     // Sprites for different thorn positions
-    public Sprite[] leftThornSprites;
+    [SerializeField] Sprite[] leftThornSprites;
     public Sprite[] middleThornSprites;
     public Sprite[] rightThornSprites;
 
     private ObjectPool<GameObject> thornPool; // Object pool for thorn management
     private Vector3[] spawnPositions; // Spawn positions for thorns
-    private Transform playerTransform; // Reference to the player
+  //  private Transform playerTransform; // Reference to the player
+
+    Coroutine spawnLoopRoutine = null;
 
     void Start()
     {
         // Get the player reference
-        GameObject player = GameObject.FindWithTag("Player");
+       /* GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
             playerTransform = player.transform;
-        }
+        }*/
 
         // Set spawn positions relative to the ThornSpawner
         spawnPositions = new Vector3[] {
@@ -49,8 +51,31 @@ public class ThornSpawner : MonoBehaviour
             maxSize: 20
         );
 
-        // Start spawning thorns periodically
-        InvokeRepeating(nameof(SpawnThorn), 2f, 2f); // Spawns every 2 seconds
+        startSpawnLoop();
+    }
+
+    void startSpawnLoop()
+    {
+        if(null != spawnLoopRoutine) return;
+        spawnLoopRoutine = StartCoroutine(spawnLoop(1f, 2f));
+    }
+
+    void stopSpawnLoop()
+    {
+        if(null == spawnLoopRoutine) return;
+        StopCoroutine(spawnLoopRoutine);
+        spawnLoopRoutine = null;
+    }
+
+    IEnumerator spawnLoop(float i_initialDelay, float i_spawnFrequency)
+    {
+        yield return new WaitForSeconds(i_initialDelay);
+
+        while(true)
+        {
+            SpawnThorn();
+            yield return new WaitForSeconds(i_spawnFrequency);
+        }
     }
 
     // Instantiates a new thorn and ensures it has a Thorn component
@@ -95,9 +120,9 @@ public class ThornSpawner : MonoBehaviour
 
         // Ensure the thorn knows how to reset the player if hit
         Thorn thornScript = thorn.GetComponent<Thorn>();
-        if (thornScript != null && playerTransform != null)
+        if (thornScript != null)
         {
-            thornScript.Initialize(this, playerTransform.position);
+            thornScript.Initialize(this);
         }
 
         // Return the thorn to the pool after 5 seconds
