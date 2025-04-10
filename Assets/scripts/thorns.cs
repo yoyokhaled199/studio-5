@@ -2,7 +2,7 @@ using UnityEngine; // Add this line at the top if it's not already present
 
 public class Thorn : MonoBehaviour
 {
-    public float moveSpeed = 3f;
+    public float moveSpeed = 1f;
     private ThornSpawner spawner;
    // private Vector3 playerStartPosition; // Store the player's start position
     private bool gameEnded = false; // Track if the game has ended
@@ -16,18 +16,18 @@ public class Thorn : MonoBehaviour
 
     void Update()
     {
-        if (spawner == null || gameEnded) return; // Safety check and don't update if game ended
+        if (spawner == null || gameEnded) return;
 
-        // Move the thorn downward
-        transform.Translate(Vector3.down * moveSpeed * Time.deltaTime);
+        float speed = GameManager.Instance != null ? GameManager.Instance.gameSpeed : moveSpeed;
+        transform.Translate(Vector3.down * speed * Time.deltaTime);
 
-        // Check if the thorn has gone off the screen and return it to the pool
-        if (transform.position.y < -6f) // Adjust this based on your screen size
+        if (transform.position.y < -6f)
         {
             ResetThorn();
-            spawner.ReturnThorn(gameObject); // Return the thorn to the pool
+            spawner.ReturnThorn(gameObject);
         }
     }
+
 
     // Check for collisions with the player
     private void OnTriggerEnter2D(Collider2D other)

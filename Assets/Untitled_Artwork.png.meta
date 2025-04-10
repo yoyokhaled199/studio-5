@@ -1,13 +1,13 @@
 fileFormatVersion: 2
-guid: d53a603f92a09cf4ebaf38b25d57aba0
+guid: 3e6bbc1cc191d6249bd94877be89d0b2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7270067466628859461
-    second: Stem_568x1920_V1 (1)_0
+      213: 1302723820812287101
+    second: Untitled_Artwork_0
   - first:
-      213: -4661444782592020196
-    second: Stem_568x1920_V1 (1)_1
+      213: 6146782616825927046
+    second: Untitled_Artwork_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -43,13 +43,13 @@ TextureImporter:
     filterMode: 1
     aniso: 1
     mipBias: 0
-    wrapU: 0
-    wrapV: 0
-    wrapW: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -129,13 +129,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Stem_568x1920_V1 (1)_0
+      name: Untitled_Artwork_0
       rect:
         serializedVersion: 2
-        x: 227
+        x: 730
         y: 0
-        width: 568
-        height: 1920
+        width: 976
+        height: 3508
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -144,20 +144,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bb9767658288b1b90800000000000000
-      internalID: -7270067466628859461
+      spriteID: d7cb4f3b964341210800000000000000
+      internalID: 1302723820812287101
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Stem_568x1920_V1 (1)_1
+      name: Untitled_Artwork_1
       rect:
         serializedVersion: 2
-        x: 853
-        y: 726
-        width: 6
-        height: 21
+        x: 1814
+        y: 1328
+        width: 9
+        height: 36
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,8 +166,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c113189eaa83f4fb0800000000000000
-      internalID: -4661444782592020196
+      spriteID: 68594731932cd4550800000000000000
+      internalID: 6146782616825927046
       vertices: []
       indices: 
       edges: []
@@ -176,7 +176,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -186,8 +186,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Stem_568x1920_V1 (1)_0: -7270067466628859461
-      Stem_568x1920_V1 (1)_1: -4661444782592020196
+      Untitled_Artwork_0: 1302723820812287101
+      Untitled_Artwork_1: 6146782616825927046
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

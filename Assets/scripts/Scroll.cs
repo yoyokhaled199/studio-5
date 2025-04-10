@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Scroll : MonoBehaviour
 {
-    public float speed = 10f; // Adjust to control scrolling speed
+    public float speed = 1f; // Adjust to control scrolling speed
     private Renderer stemRenderer;
     private Material stemMat;
 
@@ -23,16 +23,12 @@ public class Scroll : MonoBehaviour
 
     void Update()
     {
-        if(stemMat == null) return;
+        if (stemMat == null) return;
 
-        // Get current offset
+        float speed = GameManager.Instance != null ? GameManager.Instance.gameSpeed : this.speed;
         Vector2 offset = stemMat.mainTextureOffset;
-
-        // Modify Y offset for vertical scrolling
         offset.y += speed * Time.deltaTime;
-
-        // Apply updated offset back to material
         stemMat.mainTextureOffset = offset;
-
     }
+
 }
