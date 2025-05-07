@@ -28,9 +28,9 @@ public class ThornSpawner : MonoBehaviour
 
         // Set spawn positions relative to the ThornSpawner
         spawnPositions = new Vector3[] {
-            new Vector3(-2f, 0f, 0f), // Left
+            new Vector3(-2.0f, 0f, 0f), // Left
             new Vector3(0f, 0f, 0f),  // Middle
-            new Vector3(2f, 0f, 0f)   // Right
+            new Vector3(2.5f, 0f, 0f)   // Right
         };
 
         // Check if the thornPrefab is assigned

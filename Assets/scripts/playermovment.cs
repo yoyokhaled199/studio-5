@@ -55,26 +55,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
        
-        if (isAtRight && Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            return;
-        }
 
-       
-        if (isAtLeft && Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            return;
-        }
-
-      
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            isMovingUp = true;
-        }
-        else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            isMovingUp = false;
-        }
 
        
         float newY = startPosition.y + (isMovingUp ? moveHeight : 0);

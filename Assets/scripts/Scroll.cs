@@ -25,10 +25,15 @@ public class Scroll : MonoBehaviour
     {
         if (stemMat == null) return;
 
-        float speed = GameManager.Instance != null ? GameManager.Instance.gameSpeed : this.speed;
+        float speed = GameManager.Instance != null ? GameManager.Instance.gameSpeed *(float)0.8 : 1f;
+
         Vector2 offset = stemMat.mainTextureOffset;
         offset.y += speed * Time.deltaTime;
+
+        //Debug.Log(offset.y); // Logs how much the texture has moved vertically
+
         stemMat.mainTextureOffset = offset;
     }
+
 
 }

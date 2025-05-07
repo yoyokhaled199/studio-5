@@ -18,10 +18,13 @@ public class Thorn : MonoBehaviour
     {
         if (spawner == null || gameEnded) return;
 
-        float speed = GameManager.Instance != null ? GameManager.Instance.gameSpeed : moveSpeed;
-        transform.Translate(Vector3.down * speed * Time.deltaTime);
+        float speed = GameManager.Instance != null ? GameManager.Instance.gameSpeed * 10: 1f;
+        Vector3 movement = Vector3.down * speed * Time.deltaTime;
+        Debug.Log("Movement vector: " + movement);
 
-        if (transform.position.y < -6f)
+        transform.Translate(movement);
+
+        if (transform.position.y < -30f)
         {
             ResetThorn();
             spawner.ReturnThorn(gameObject);
