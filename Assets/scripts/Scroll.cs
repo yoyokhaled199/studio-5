@@ -2,38 +2,37 @@ using UnityEngine;
 
 public class Scroll : MonoBehaviour
 {
-    public float speed = 1f; // Adjust to control scrolling speed
+    [SerializeField] private float scrollFactor = 0.8f;
     private Renderer stemRenderer;
     private Material stemMat;
 
     void Start()
     {
-        // Get the Renderer component attached to this GameObject
         stemRenderer = GetComponent<Renderer>();
-
         if (stemRenderer == null)
         {
             Debug.LogError("No Renderer found on " + gameObject.name);
+            return;
         }
-        else
+
+        stemMat = stemRenderer.material;
+        if (stemMat == null)
         {
-            stemMat = stemRenderer.material;
+            Debug.LogError("No Material found on renderer of " + gameObject.name);
         }
     }
 
     void Update()
     {
-        if (stemMat == null) return;
+        if (stemMat == null || GameManager.Instance == null || GameManager.Instance.isGameOver)
+            return;
 
-        float speed = GameManager.Instance != null ? GameManager.Instance.gameSpeed *(float)0.8 : 1f;
+        float gameSpeed = GameManager.Instance.GameSpeed;
+        float yOffset = gameSpeed * scrollFactor * Time.deltaTime;
 
         Vector2 offset = stemMat.mainTextureOffset;
-        offset.y += speed * Time.deltaTime;
-
-        //Debug.Log(offset.y); // Logs how much the texture has moved vertically
+        offset.y += yOffset;
 
         stemMat.mainTextureOffset = offset;
     }
-
-
 }

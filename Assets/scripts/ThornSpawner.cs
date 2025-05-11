@@ -1,164 +1,159 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ThornSpawner : MonoBehaviour
 {
-    public GameObject thornPrefab; // Thorn prefab reference
+    [Header("Settings")]
+    [SerializeField] private GameObject thornPrefab;
+    [SerializeField] private float spawnInterval = 2f;
+    [SerializeField] private float thornLifetime = 5f;
 
-    // Sprites for different thorn positions
-    [SerializeField] Sprite[] leftThornSprites;
-    public Sprite[] middleThornSprites;
-    public Sprite[] rightThornSprites;
+    [Header("Spawn Positions")]
+    [SerializeField]
+    private Vector3[] spawnPositions = new Vector3[]
+    {
+        new Vector3(-2f, 0f, 0f),
+        new Vector3(0f, 0f, 0f),
+        new Vector3(2.5f, 0f, 0f)
+    };
 
-    private ObjectPool<GameObject> thornPool; // Object pool for thorn management
-    private Vector3[] spawnPositions; // Spawn positions for thorns
-  //  private Transform playerTransform; // Reference to the player
+    [Header("Sprites")]
+    [SerializeField] private Sprite[] leftThornSprites;
+    [SerializeField] private Sprite[] middleThornSprites;
+    [SerializeField] private Sprite[] rightThornSprites;
 
-    Coroutine spawnLoopRoutine = null;
+    private ObjectPool<GameObject> thornPool;
+    private List<GameObject> activeThorns = new List<GameObject>();
+    private Coroutine spawnCoroutine;
 
     void Start()
     {
-        // Get the player reference
-       /* GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
-        {
-            playerTransform = player.transform;
-        }*/
-
-        // Set spawn positions relative to the ThornSpawner
-        spawnPositions = new Vector3[] {
-            new Vector3(-2.0f, 0f, 0f), // Left
-            new Vector3(0f, 0f, 0f),  // Middle
-            new Vector3(2.5f, 0f, 0f)   // Right
-        };
-
-        // Check if the thornPrefab is assigned
         if (thornPrefab == null)
         {
-            Debug.LogError("Thorn Prefab is not assigned!");
+            Debug.LogError("Thorn prefab is not assigned!");
             return;
         }
 
-        // Initialize the object pool for thorns
+        InitializePool();
+        StartSpawning();
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.RegisterThornSpawner(this);
+        else
+            Debug.LogWarning("GameManager.Instance is null in ThornSpawner.");
+    }
+
+    void InitializePool()
+    {
         thornPool = new ObjectPool<GameObject>(
-            createFunc: () => InstantiateThorn(),
-            actionOnGet: (thorn) => thorn.SetActive(true),
-            actionOnRelease: (thorn) => thorn.SetActive(false),
+            createFunc: () => {
+                GameObject thorn = Instantiate(thornPrefab);
+                Thorn thornScript = thorn.GetComponent<Thorn>() ?? thorn.AddComponent<Thorn>();
+                thornScript.Initialize(this);
+                return thorn;
+            },
+            actionOnGet: (thorn) => {
+                thorn.SetActive(true);
+                activeThorns.Add(thorn);
+            },
+            actionOnRelease: (thorn) => {
+                thorn.SetActive(false);
+                activeThorns.Remove(thorn);
+            },
             actionOnDestroy: (thorn) => Destroy(thorn),
             collectionCheck: false,
             defaultCapacity: 10,
             maxSize: 20
         );
-
-        startSpawnLoop();
     }
 
-    void startSpawnLoop()
+    void StartSpawning()
     {
-        if(null != spawnLoopRoutine) return;
-        spawnLoopRoutine = StartCoroutine(spawnLoop(1f, 2f));
+        if (spawnCoroutine != null)
+            StopCoroutine(spawnCoroutine);
+
+        spawnCoroutine = StartCoroutine(SpawnRoutine());
     }
 
-    void stopSpawnLoop()
-    {
-        if(null == spawnLoopRoutine) return;
-        StopCoroutine(spawnLoopRoutine);
-        spawnLoopRoutine = null;
-    }
 
-    IEnumerator spawnLoop(float i_initialDelay, float i_spawnFrequency)
+    IEnumerator SpawnRoutine()
     {
-        yield return new WaitForSeconds(i_initialDelay);
+        yield return new WaitForSeconds(1f); // Initial delay
 
-        while(true)
+        while (true)
         {
-            SpawnThorn();
-            yield return new WaitForSeconds(i_spawnFrequency);
+            if (GameManager.Instance != null && !GameManager.Instance.isGameOver && spawnPositions.Length > 0)
+            {
+                SpawnThorn();
+            }
+
+            yield return new WaitForSeconds(spawnInterval);
         }
     }
 
-    // Instantiates a new thorn and ensures it has a Thorn component
-    GameObject InstantiateThorn()
-    {
-        GameObject thorn = Instantiate(thornPrefab);
-        Thorn thornScript = thorn.GetComponent<Thorn>();
-
-        // Ensure Thorn script is attached
-        if (thornScript == null)
-        {
-            thornScript = thorn.AddComponent<Thorn>();
-        }
-
-        return thorn;
-    }
-
-    // Spawns a thorn at a random position and assigns the correct sprite
     void SpawnThorn()
     {
-        GameObject thorn = thornPool.Get(); // Get thorn from pool
+        if (thornPool == null || spawnPositions.Length == 0) return;
 
-        // Choose a random spawn position (left, middle, right)
-        int positionIndex = Random.Range(0, spawnPositions.Length);
-        Vector3 spawnPosition = spawnPositions[positionIndex];
-        thorn.transform.position = transform.position + spawnPosition;
+        GameObject thorn = thornPool.Get();
+        int posIndex = Random.Range(0, spawnPositions.Length);
+        thorn.transform.position = transform.position + spawnPositions[posIndex];
 
-        // Assign the correct sprite if available
-        SpriteRenderer spriteRenderer = thorn.GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null)
+        // Safe sprite assignment
+        SpriteRenderer renderer = thorn.GetComponent<SpriteRenderer>();
+        if (renderer != null)
         {
-            Sprite selectedSprite = GetRandomThornSprite(positionIndex);
-            if (selectedSprite != null)
+            switch (posIndex)
             {
-                spriteRenderer.sprite = selectedSprite;
-            }
-            else
-            {
-                Debug.LogWarning("No sprite available for position index " + positionIndex);
+                case 0:
+                    if (leftThornSprites.Length > 0)
+                        renderer.sprite = leftThornSprites[Random.Range(0, leftThornSprites.Length)];
+                    break;
+                case 1:
+                    if (middleThornSprites.Length > 0)
+                        renderer.sprite = middleThornSprites[Random.Range(0, middleThornSprites.Length)];
+                    break;
+                case 2:
+                    if (rightThornSprites.Length > 0)
+                        renderer.sprite = rightThornSprites[Random.Range(0, rightThornSprites.Length)];
+                    break;
+                default:
+                    renderer.sprite = null;
+                    break;
             }
         }
 
-        // Ensure the thorn knows how to reset the player if hit
-        Thorn thornScript = thorn.GetComponent<Thorn>();
-        if (thornScript != null)
-        {
-            thornScript.Initialize(this);
-        }
-
-        // Return the thorn to the pool after 5 seconds
-        StartCoroutine(ReturnThornToPool(thorn, 5f));
+        StartCoroutine(ReturnThornAfterDelay(thorn, thornLifetime));
     }
 
-    // Returns a random sprite based on the spawn position
-    private Sprite GetRandomThornSprite(int positionIndex)
-    {
-        // Make sure arrays are not empty and indices are valid
-        if (positionIndex == 0 && leftThornSprites.Length > 0)
-        {
-            return leftThornSprites[Random.Range(0, leftThornSprites.Length)];
-        }
-        else if (positionIndex == 1 && middleThornSprites.Length > 0)
-        {
-            return middleThornSprites[Random.Range(0, middleThornSprites.Length)];
-        }
-        else if (positionIndex == 2 && rightThornSprites.Length > 0)
-        {
-            return rightThornSprites[Random.Range(0, rightThornSprites.Length)];
-        }
-
-        return null; // Return null if no sprite available
-    }
-
-    // Returns the thorn to the pool after a delay
-    IEnumerator ReturnThornToPool(GameObject thorn, float delay)
+    IEnumerator ReturnThornAfterDelay(GameObject thorn, float delay)
     {
         yield return new WaitForSeconds(delay);
-        thornPool.Release(thorn); // Return thorn to pool after delay
+        ReturnThorn(thorn);
     }
 
-    // Public function to return thorn manually
     public void ReturnThorn(GameObject thorn)
     {
-        thornPool.Release(thorn); // Return thorn to pool
+        if (thorn != null && thornPool != null && thorn.activeSelf)
+        {
+            thornPool.Release(thorn);
+        }
+    }
+
+    public void HandleGameRestart()
+    {
+        foreach (var thorn in activeThorns.ToArray())
+            ReturnThorn(thorn);
+
+        StartSpawning(); // ✅ This MUST start the coroutine again
+    }
+
+
+    void OnDestroy()
+    {
+        if (spawnCoroutine != null)
+            StopCoroutine(spawnCoroutine);
     }
 }

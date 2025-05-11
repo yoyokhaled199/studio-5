@@ -1,4 +1,4 @@
-using UnityEngine; // Add this line at the top if it's not already present
+using UnityEngine; 
 
 public class Thorn : MonoBehaviour
 {
@@ -18,9 +18,8 @@ public class Thorn : MonoBehaviour
     {
         if (spawner == null || gameEnded) return;
 
-        float speed = GameManager.Instance != null ? GameManager.Instance.gameSpeed * 10: 1f;
+        float speed = GameManager.Instance != null ? GameManager.Instance.GameSpeed * 10 : 1f;
         Vector3 movement = Vector3.down * speed * Time.deltaTime;
-        Debug.Log("Movement vector: " + movement);
 
         transform.Translate(movement);
 
@@ -35,11 +34,13 @@ public class Thorn : MonoBehaviour
     // Check for collisions with the player
     private void OnTriggerEnter2D(Collider2D other)
     {
+        
         if(gameEnded) return;
 
         Player player = other.gameObject.GetComponent<Player>();
         if (null != player) // Check if the thorn collides with the player
         {
+            
             player.ResetToInitialPosition();
             // Optionally reset player position, if you want to restart the level from a specific position
 
@@ -48,6 +49,8 @@ public class Thorn : MonoBehaviour
 
             // Trigger the game over function
             EndGame();
+            AudioManager.Instance.StopMusic();
+            AudioManager.Instance.PlayLoseSound();
         }
     }
 
@@ -63,6 +66,8 @@ public class Thorn : MonoBehaviour
     // needs to be move to some sort of game manager
     void EndGame()
     {
+        GameManager.Instance?.GameOver();
+
         gameEnded = true;
         Time.timeScale = 0f; // Freeze the game
     }
