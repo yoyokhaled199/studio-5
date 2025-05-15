@@ -8,6 +8,7 @@ public class ThornSpawner : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private GameObject thornPrefab;
     [SerializeField] private float spawnInterval = 2f;
+    [SerializeField] private float minSpawnInterval = 0.5f;
     [SerializeField] private float thornLifetime = 5f;
 
     [Header("Spawn Positions")]
@@ -32,7 +33,6 @@ public class ThornSpawner : MonoBehaviour
     {
         if (thornPrefab == null)
         {
-            Debug.LogError("Thorn prefab is not assigned!");
             return;
         }
 
@@ -41,8 +41,6 @@ public class ThornSpawner : MonoBehaviour
 
         if (GameManager.Instance != null)
             GameManager.Instance.RegisterThornSpawner(this);
-        else
-            Debug.LogWarning("GameManager.Instance is null in ThornSpawner.");
     }
 
     void InitializePool()
@@ -77,10 +75,9 @@ public class ThornSpawner : MonoBehaviour
         spawnCoroutine = StartCoroutine(SpawnRoutine());
     }
 
-
     IEnumerator SpawnRoutine()
     {
-        yield return new WaitForSeconds(1f); // Initial delay
+        yield return new WaitForSeconds(1f);
 
         while (true)
         {
@@ -101,7 +98,6 @@ public class ThornSpawner : MonoBehaviour
         int posIndex = Random.Range(0, spawnPositions.Length);
         thorn.transform.position = transform.position + spawnPositions[posIndex];
 
-        // Safe sprite assignment
         SpriteRenderer renderer = thorn.GetComponent<SpriteRenderer>();
         if (renderer != null)
         {
@@ -147,9 +143,17 @@ public class ThornSpawner : MonoBehaviour
         foreach (var thorn in activeThorns.ToArray())
             ReturnThorn(thorn);
 
-        StartSpawning(); // ✅ This MUST start the coroutine again
+        StartSpawning();
     }
 
+    public void DecreaseSpawnInterval(float amount)
+    {
+        spawnInterval -= amount;
+        if (spawnInterval < minSpawnInterval)
+            spawnInterval = minSpawnInterval;
+
+        StartSpawning();
+    }
 
     void OnDestroy()
     {

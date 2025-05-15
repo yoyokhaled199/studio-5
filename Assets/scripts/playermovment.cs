@@ -2,66 +2,191 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveDistance = 2f; 
-    public float moveHeight = 1f;   
-    public float upDownSpeed = 2f;  
+    [Header("Movement Settings")]
+    public float moveDistance = 2f;
+    public float moveHeight = 1f;
+    public float moveSpeed = 5f;
+    public float fallSpeed = 5f;
+
+    [Header("Sprite Settings")]
     public SpriteRenderer spriteRenderer;
     public Sprite middleSprite;
     public Sprite rightSprite;
     public Sprite leftSprite;
 
-    private Vector3 startPosition;
-    private bool isAtMiddle = true; 
-    private bool isAtRight = false; 
-    private bool isAtLeft = false;  
-    private bool isMovingUp = false;
-    private Vector3 targetPosition; 
+    private Vector3 middlePosition;
+    private Vector3 leftPosition;
+    private Vector3 rightPosition;
 
-    void Start()
+    private Vector3 targetPosition;
+    private PlayerPosition currentPosition = PlayerPosition.Middle;
+    private bool isMoving = false;
+    private bool isFrozen = false;
+    private bool isFalling = false;
+
+    private enum PlayerPosition
     {
-        startPosition = transform.position; 
-        targetPosition = startPosition;
+        Middle,
+        Right,
+        Left
+    }
+
+    void Awake()
+    {
+        middlePosition = transform.position;
+        leftPosition = middlePosition + Vector3.left * moveDistance;
+        rightPosition = middlePosition + Vector3.right * moveDistance;
+
+        targetPosition = transform.position;
+        UpdateCurrentPositionBasedOnLocation();
+    }
+
+    void UpdateCurrentPositionBasedOnLocation()
+    {
+        float distToLeft = Vector3.Distance(transform.position, leftPosition);
+        float distToMiddle = Vector3.Distance(transform.position, middlePosition);
+        float distToRight = Vector3.Distance(transform.position, rightPosition);
+
+        if (distToLeft < distToMiddle && distToLeft < distToRight)
+        {
+            currentPosition = PlayerPosition.Left;
+            spriteRenderer.sprite = leftSprite;
+        }
+        else if (distToRight < distToMiddle && distToRight < distToLeft)
+        {
+            currentPosition = PlayerPosition.Right;
+            spriteRenderer.sprite = rightSprite;
+        }
+        else
+        {
+            currentPosition = PlayerPosition.Middle;
+            spriteRenderer.sprite = middleSprite;
+        }
     }
 
     void Update()
     {
-    
-        if (Input.GetKeyDown(KeyCode.RightArrow) && isAtMiddle)
+        if (isFalling)
         {
-            targetPosition = startPosition + new Vector3(moveDistance, 0, 0);
-            spriteRenderer.sprite = rightSprite;
-            isAtMiddle = false;
-            isAtRight = true;
-            isAtLeft = false;
-        }
-     
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) && isAtMiddle)
-        {
-            targetPosition = startPosition + new Vector3(-moveDistance, 0, 0);
-            spriteRenderer.sprite = leftSprite;
-            isAtMiddle = false;
-            isAtLeft = true;
-            isAtRight = false;
-        }
-      
-        else if ((Input.GetKeyDown(KeyCode.LeftArrow) && isAtRight) ||
-                 (Input.GetKeyDown(KeyCode.RightArrow) && isAtLeft))
-        {
-            targetPosition = startPosition;
-            spriteRenderer.sprite = middleSprite;
-            isAtMiddle = true;
-            isAtRight = false;
-            isAtLeft = false;
+            transform.position += Vector3.down * fallSpeed * Time.deltaTime;
+            return;
         }
 
-       
+        if (GameManager.Instance != null && GameManager.Instance.isGameOver)
+        {
+            isFalling = true;
+            isFrozen = true;
+            isMoving = false;
+            return;
+        }
 
+        if (!isFrozen)
+        {
+            HandleInput();
+            MovePlayer();
+        }
+    }
 
-       
-        float newY = startPosition.y + (isMovingUp ? moveHeight : 0);
-        targetPosition = new Vector3(targetPosition.x, newY, targetPosition.z);
+    private void HandleInput()
+    {
+        if (isMoving) return;
 
-      
-        transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * upDownSpeed);
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            switch (currentPosition)
+            {
+                case PlayerPosition.Middle:
+                    MoveToPosition(PlayerPosition.Right, rightPosition);
+                    break;
+                case PlayerPosition.Left:
+                    MoveToPosition(PlayerPosition.Middle, middlePosition);
+                    break;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            switch (currentPosition)
+            {
+                case PlayerPosition.Middle:
+                    MoveToPosition(PlayerPosition.Left, leftPosition);
+                    break;
+                case PlayerPosition.Right:
+                    MoveToPosition(PlayerPosition.Middle, middlePosition);
+                    break;
+            }
+        }
+    }
+
+    private void MoveToPosition(PlayerPosition newPosition, Vector3 position)
+    {
+        currentPosition = newPosition;
+        targetPosition = position;
+        isMoving = true;
+
+        spriteRenderer.sprite = newPosition switch
+        {
+            PlayerPosition.Left => leftSprite,
+            PlayerPosition.Right => rightSprite,
+            _ => middleSprite
+        };
+    }
+
+    private void MovePlayer()
+    {
+        if (isMoving && !isFrozen)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                targetPosition,
+                moveSpeed * Time.deltaTime
+            );
+
+            if (Vector3.Distance(transform.position, targetPosition) < 0.001f)
+            {
+                transform.position = targetPosition;
+                isMoving = false;
+            }
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Hazard"))
+        {
+            FreezePlayer();
+            GameManager.Instance?.GameOver();
+        }
+    }
+
+    public void FreezePlayer()
+    {
+        isFrozen = true;
+        isMoving = false;
+    }
+
+    public void UnfreezePlayer()
+    {
+        isFrozen = false;
+    }
+
+    public void SavePosition()
+    {
+        PlayerPrefs.SetFloat("PlayerX", transform.position.x);
+        PlayerPrefs.SetFloat("PlayerY", transform.position.y);
+        PlayerPrefs.SetFloat("PlayerZ", transform.position.z);
+    }
+
+    public void LoadPosition()
+    {
+        if (PlayerPrefs.HasKey("PlayerX"))
+        {
+            Vector3 savedPos = new Vector3(
+                PlayerPrefs.GetFloat("PlayerX"),
+                PlayerPrefs.GetFloat("PlayerY"),
+                PlayerPrefs.GetFloat("PlayerZ")
+            );
+            transform.position = savedPos;
+            UpdateCurrentPositionBasedOnLocation();
+        }
     }
 }

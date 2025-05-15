@@ -4,7 +4,7 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
 
-    public AudioSource sfxSource; //for the sound effects
+    public AudioSource sfxSource; 
     public AudioClip loseSound;
     public AudioClip rainSound;
     public AudioSource musicSource;
@@ -19,7 +19,7 @@ public class AudioManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    //for any SFX
+
     public void PlaySFX(AudioClip clip)
     {
         if (clip != null)
@@ -27,17 +27,17 @@ public class AudioManager : MonoBehaviour
             sfxSource.PlayOneShot(clip);
         }
     }
-    //for the lose sound
+
     public void PlayLoseSound()
     {
         PlaySFX(loseSound);
     }
-    //for the rain challange
+
     public void PlayRain()
     {
         PlaySFX(rainSound);
     }
-    //to stop the music
+  
     public void StopMusic()
     {
         if (musicSource != null)

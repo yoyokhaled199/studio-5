@@ -60,9 +60,14 @@
     <Analyzer Include="E:\unity\6000.0.38f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ArabicSupport\Scenes\Scripts\Testing\ExpectedFixedText.cs" />
+    <Compile Include="Assets\scripts\arabic_support.cs" />
     <Compile Include="Assets\scripts\UIManager.cs" />
+    <Compile Include="Assets\ArabicSupport\Scenes\Scripts\Samples\FixArabic3DText.cs" />
     <Compile Include="Assets\scripts\playermovment.cs" />
+    <Compile Include="Assets\scripts\MenuScript.cs" />
     <Compile Include="Assets\scripts\Player.cs" />
+    <Compile Include="Assets\ArabicSupport\Scenes\Scripts\ArabicSupport.cs" />
     <Compile Include="Assets\scripts\ThornSpawner.cs" />
     <Compile Include="Assets\scripts\GameManager.cs" />
     <Compile Include="Assets\scripts\thorns.cs" />

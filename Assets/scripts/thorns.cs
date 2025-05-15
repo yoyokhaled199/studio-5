@@ -4,14 +4,14 @@ public class Thorn : MonoBehaviour
 {
     public float moveSpeed = 1f;
     private ThornSpawner spawner;
-   // private Vector3 playerStartPosition; // Store the player's start position
-    private bool gameEnded = false; // Track if the game has ended
+  
+    private bool gameEnded = false; 
 
-    // Modify Initialize to accept both the ThornSpawner and the player's start position
+   
     public void Initialize(ThornSpawner thornSpawner)
     {
         spawner = thornSpawner;
-      //  playerStartPosition = startPos;
+     
     }
 
     void Update()
@@ -31,44 +31,35 @@ public class Thorn : MonoBehaviour
     }
 
 
-    // Check for collisions with the player
     private void OnTriggerEnter2D(Collider2D other)
     {
         
         if(gameEnded) return;
 
         Player player = other.gameObject.GetComponent<Player>();
-        if (null != player) // Check if the thorn collides with the player
+        if (null != player) 
         {
             
-            player.ResetToInitialPosition();
-            // Optionally reset player position, if you want to restart the level from a specific position
+            
 
-            // Trigger a collision event
-            // You game manager could listen to it
-
-            // Trigger the game over function
             EndGame();
             AudioManager.Instance.StopMusic();
             AudioManager.Instance.PlayLoseSound();
         }
     }
 
-    // Reset the thorn's position and deactivate it before returning it to the pool
     public void ResetThorn()
     {
-        transform.position = new Vector3(0, 6f, 0); // Example position; adjust as needed
+        transform.position = new Vector3(0, 6f, 0); 
         gameObject.SetActive(false);
     }
 
-    // End the game (Stop time and show Game Over)
-    // end game, timescale 0, all that logic
-    // needs to be move to some sort of game manager
+
     void EndGame()
     {
         GameManager.Instance?.GameOver();
 
         gameEnded = true;
-        Time.timeScale = 0f; // Freeze the game
+      
     }
 }

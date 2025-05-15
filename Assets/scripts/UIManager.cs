@@ -1,13 +1,15 @@
+﻿using UnityEngine;
 using TMPro;
-using UnityEngine;
+using ArabicSupport;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    [Header("Gameplay UI")]
+    [Header("واجهة اللعب")]
     [SerializeField] private TextMeshProUGUI mileCounterText;
     [SerializeField] private TextMeshProUGUI highScoreText;
 
-    [Header("Game Over UI")]
+    [Header("واجهة نهاية اللعبة")]
     [SerializeField] private TextMeshProUGUI finalScoreText;
     [SerializeField] private GameObject gameOverPanel;
 
@@ -19,7 +21,6 @@ public class UIManager : MonoBehaviour
     {
         if (GameManager.Instance == null)
         {
-            Debug.LogError("GameManager instance not found!");
             enabled = false;
             return;
         }
@@ -56,6 +57,9 @@ public class UIManager : MonoBehaviour
             }
         }
 
+        UpdateMileText();
+        UpdateHighScoreText();
+
         if (game.isGameOver && Input.GetKeyDown(KeyCode.R))
         {
             HandleRestartInput();
@@ -68,7 +72,7 @@ public class UIManager : MonoBehaviour
 
         if (finalScoreText != null)
         {
-            finalScoreText.text = $"You Ran: {miles:F1} Miles\nBest Run: {highScore:F1} Miles";
+            finalScoreText.text = ArabicFixer.Fix($"لقد ركضت: {miles:F1} ميل\nأفضل ركضة: {highScore:F1} ميل");
         }
 
         if (gameOverPanel != null)
@@ -79,12 +83,19 @@ public class UIManager : MonoBehaviour
 
     private void HandleRestartInput()
     {
-        Debug.Log("Restart initiated via keyboard");
-
         ResetGame();
-
         if (GameManager.Instance != null)
             GameManager.Instance.RestartGame();
+    }
+
+    public void OnRestartButton()
+    {
+        HandleRestartInput();
+    }
+
+    public void OnMainMenuButton()
+    {
+        SceneManager.LoadScene("MenuScene");
     }
 
     public void ResetGame()
@@ -100,13 +111,13 @@ public class UIManager : MonoBehaviour
     private void UpdateMileText()
     {
         if (mileCounterText != null)
-            mileCounterText.text = $"{miles:F1} Miles";
+            mileCounterText.text = ArabicFixer.Fix($"{miles:F1} ميل");
     }
 
     private void UpdateHighScoreText()
     {
         if (highScoreText != null)
-            highScoreText.text = $"Best: {highScore:F1}";
+            highScoreText.text = ArabicFixer.Fix($"الأفضل: {highScore:F1}");
     }
 
     private void SaveHighScore()
