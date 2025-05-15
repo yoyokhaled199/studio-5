@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95a1a81513c50422da7ed6f87fcadde4, type: 3}
+  m_Name: PlayerConfig_ant
+  m_EditorClassIdentifier: 
+  middleSprite: {fileID: -8127879004084611981, guid: 5f2860239604bc045bc039502d4064ef, type: 3}
+  rightSprite: {fileID: -4345969612696422427, guid: ca71cef4efeda8c44b54898ff9c38afd, type: 3}
+  leftSprite: {fileID: -2208510542369132325, guid: fb1368205898c314f913c02cec058553, type: 3}

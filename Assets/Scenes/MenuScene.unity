@@ -961,14 +961,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfa6c31845b89654dad3dd7d9a8d689b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterNames:
-  - Ant
-  - Worm
-  characterPreviews:
-  - {fileID: -8127879004084611981, guid: 5f2860239604bc045bc039502d4064ef, type: 3}
-  - {fileID: -5348974160857761915, guid: c58649dc8bbe5f54e88a15b688ba47b1, type: 3}
-  characterPreviewImage: {fileID: 0}
-  characterNameText: {fileID: 0}
 --- !u!4 &1658236533
 Transform:
   m_ObjectHideFlags: 0
@@ -1204,7 +1196,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u0627\u062A\u0633\u0644\u0642\n"
+  m_text: "\u0627\u062A\u0633\u0644\u0642"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 317243fb663b9cc4b8f02366eef61430, type: 2}
   m_sharedMaterial: {fileID: -7412993434577280688, guid: 317243fb663b9cc4b8f02366eef61430, type: 2}
