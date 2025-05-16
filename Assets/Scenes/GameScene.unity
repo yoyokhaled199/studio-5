@@ -325,14 +325,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaa0313b2f2aa0b4399e87c6399d142b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  config: {fileID: 0}
   moveDistance: 2
   moveHeight: 0.5
   moveSpeed: 5
   fallSpeed: 5
   spriteRenderer: {fileID: 113472209}
-  middleSprite: {fileID: 0}
-  rightSprite: {fileID: 0}
-  leftSprite: {fileID: 0}
 --- !u!50 &113472212
 Rigidbody2D:
   serializedVersion: 5
@@ -1896,14 +1894,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaa0313b2f2aa0b4399e87c6399d142b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: c59fdc118b8074d9a9e9906e1e566e6b, type: 2}
   moveDistance: 2
   moveHeight: 0.5
   moveSpeed: 5
   fallSpeed: 5
   spriteRenderer: {fileID: 922140487}
-  middleSprite: {fileID: -8127879004084611981, guid: 5f2860239604bc045bc039502d4064ef, type: 3}
-  rightSprite: {fileID: -4345969612696422427, guid: ca71cef4efeda8c44b54898ff9c38afd, type: 3}
-  leftSprite: {fileID: -2208510542369132325, guid: fb1368205898c314f913c02cec058553, type: 3}
 --- !u!50 &1522176386
 Rigidbody2D:
   serializedVersion: 5

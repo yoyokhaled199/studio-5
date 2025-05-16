@@ -2,17 +2,18 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [SerializeField] PlayerConfig config = null;
+
     [Header("Movement Settings")]
     public float moveDistance = 2f;
     public float moveHeight = 1f;
+    // Code review : put these in player config
+    // so that worm and ant have different stats
     public float moveSpeed = 5f;
     public float fallSpeed = 5f;
 
     [Header("Sprite Settings")]
     public SpriteRenderer spriteRenderer;
-    public Sprite middleSprite;
-    public Sprite rightSprite;
-    public Sprite leftSprite;
 
     private Vector3 middlePosition;
     private Vector3 leftPosition;
@@ -30,6 +31,9 @@ public class PlayerMovement : MonoBehaviour
         Right,
         Left
     }
+
+    // Code review : the player movement needs to be initialized
+    // with the config (ant or worm) that the player chose in the menu
 
     void Awake()
     {
@@ -50,17 +54,17 @@ public class PlayerMovement : MonoBehaviour
         if (distToLeft < distToMiddle && distToLeft < distToRight)
         {
             currentPosition = PlayerPosition.Left;
-            spriteRenderer.sprite = leftSprite;
+            spriteRenderer.sprite = config.leftSprite;
         }
         else if (distToRight < distToMiddle && distToRight < distToLeft)
         {
             currentPosition = PlayerPosition.Right;
-            spriteRenderer.sprite = rightSprite;
+            spriteRenderer.sprite = config.rightSprite;
         }
         else
         {
             currentPosition = PlayerPosition.Middle;
-            spriteRenderer.sprite = middleSprite;
+            spriteRenderer.sprite = config.middleSprite;
         }
     }
 
@@ -89,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleInput()
     {
-        if (isMoving) return;
+       // if (isMoving) return;
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -125,9 +129,9 @@ public class PlayerMovement : MonoBehaviour
 
         spriteRenderer.sprite = newPosition switch
         {
-            PlayerPosition.Left => leftSprite,
-            PlayerPosition.Right => rightSprite,
-            _ => middleSprite
+            PlayerPosition.Left => config.leftSprite,
+            PlayerPosition.Right => config.rightSprite,
+            _ => config.middleSprite
         };
     }
 
