@@ -22,6 +22,9 @@ public class GameManager : MonoBehaviour
 
     public float GameSpeed => gameSpeed;
 
+    // --- NEW: Flag to track collision sound ---
+    private bool hasPlayedCollisionSound = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -49,7 +52,6 @@ public class GameManager : MonoBehaviour
         thornSpawner = FindFirstObjectByType<ThornSpawner>();
         uiManager = FindFirstObjectByType<UIManager>();
 
-
         if (scene.name == "GameScene")
         {
             isGameOver = false;
@@ -60,6 +62,8 @@ public class GameManager : MonoBehaviour
 
             gameSpeed = 0.8f;
             difficultyTimer = 0f;
+
+            hasPlayedCollisionSound = false;
         }
     }
 
@@ -124,6 +128,8 @@ public class GameManager : MonoBehaviour
         if (!isGameOver) return;
         isGameOver = false;
 
+        hasPlayedCollisionSound = false;
+
         player?.ResetToInitialPosition();
         thornSpawner?.HandleGameRestart();
         uiManager?.ResetGame();
@@ -132,5 +138,15 @@ public class GameManager : MonoBehaviour
         difficultyTimer = 0f;
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void PlayCollisionSoundOnce(AudioSource collisionSound)
+    {
+        if (!hasPlayedCollisionSound)
+        {
+            hasPlayedCollisionSound = true;
+            if (collisionSound != null)
+                collisionSound.Play();
+        }
     }
 }

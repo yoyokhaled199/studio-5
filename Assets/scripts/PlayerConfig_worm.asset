@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   middleSprites:
   - {fileID: -5348974160857761915, guid: c58649dc8bbe5f54e88a15b688ba47b1, type: 3}
+  - {fileID: 112839671746886080, guid: 37b0c6d274853dc4bbcd80f9da25309a, type: 3}
   rightSprites:
   - {fileID: -4345969612696422427, guid: 358f2fdcb4accfc409e5d8e5013b4bc8, type: 3}
   - {fileID: -1486672481693305442, guid: a1a5ec026768ba34fb897a91a2b0eb42, type: 3}
