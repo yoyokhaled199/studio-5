@@ -14,10 +14,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PixelRect:
     serializedVersion: 2
-    x: 0
-    y: 43.2
-    width: 2048
-    height: 1204.8
+    x: 285.6
+    y: 87.200005
+    width: 320.80002
+    height: 578.4
+  m_ShowMode: 0
+  m_Title: Publish
+  m_RootView: {fileID: 4}
+  m_MinSize: {x: 300, y: 326}
+  m_MaxSize: {x: 600, y: 626}
+  m_Maximized: 0
+--- !u!114 &2
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 12004, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PixelRect:
+    serializedVersion: 2
+    x: 0.8
+    y: 50.4
+    width: 1022.4
+    height: 1196.8
   m_ShowMode: 4
   m_Title: Scene
   m_RootView: {fileID: 9}
