@@ -1,71 +1,46 @@
 using UnityEngine;
 
+
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] PlayerConfig config = null;
+    [Header("Configs")]
+    [SerializeField] private PlayerConfig antConfig;
+    [SerializeField] private PlayerConfig wormConfig;
+
+    [Header("Sprite & Animation")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [Tooltip("Seconds per animation frame")]
+    [SerializeField] private float animationFrameRate = 0.15f;
 
     [Header("Movement Settings")]
-    public float moveDistance = 2f;
-    public float moveHeight = 1f;
-    // Code review : put these in player config
-    // so that worm and ant have different stats
-    public float moveSpeed = 5f;
-    public float fallSpeed = 5f;
+    [SerializeField] private float moveDistance = 2f;
+    [SerializeField] private float moveSpeed = 30f; 
+    [SerializeField] private float fallSpeed = 8f;
 
-    [Header("Sprite Settings")]
-    public SpriteRenderer spriteRenderer;
-
-    private Vector3 middlePosition;
-    private Vector3 leftPosition;
-    private Vector3 rightPosition;
-
-    private Vector3 targetPosition;
+    private PlayerConfig config;
+    private Vector3 middlePosition, leftPosition, rightPosition, targetPosition;
     private PlayerPosition currentPosition = PlayerPosition.Middle;
-    private bool isMoving = false;
-    private bool isFrozen = false;
-    private bool isFalling = false;
+    private bool isFrozen = false, isFalling = false;
 
-    private enum PlayerPosition
-    {
-        Middle,
-        Right,
-        Left
-    }
+    private int animFrame = 0;
+    private float animTimer = 0f;
 
-    // Code review : the player movement needs to be initialized
-    // with the config (ant or worm) that the player chose in the menu
+    private enum PlayerPosition { Left, Middle, Right }
 
     void Awake()
     {
+        string selected = PlayerPrefs.GetString("SelectedCharacter", "ant");
+        config = selected == "worm" ? wormConfig : antConfig;
+        if (config == null) Debug.LogError("PlayerConfig not assigned!");
+
         middlePosition = transform.position;
         leftPosition = middlePosition + Vector3.left * moveDistance;
         rightPosition = middlePosition + Vector3.right * moveDistance;
+        targetPosition = middlePosition;
 
-        targetPosition = transform.position;
-        UpdateCurrentPositionBasedOnLocation();
-    }
-
-    void UpdateCurrentPositionBasedOnLocation()
-    {
-        float distToLeft = Vector3.Distance(transform.position, leftPosition);
-        float distToMiddle = Vector3.Distance(transform.position, middlePosition);
-        float distToRight = Vector3.Distance(transform.position, rightPosition);
-
-        if (distToLeft < distToMiddle && distToLeft < distToRight)
-        {
-            currentPosition = PlayerPosition.Left;
-            spriteRenderer.sprite = config.leftSprite;
-        }
-        else if (distToRight < distToMiddle && distToRight < distToLeft)
-        {
-            currentPosition = PlayerPosition.Right;
-            spriteRenderer.sprite = config.rightSprite;
-        }
-        else
-        {
-            currentPosition = PlayerPosition.Middle;
-            spriteRenderer.sprite = config.middleSprite;
-        }
+        animFrame = 0;
+        animTimer = 0f;
+        SetSpriteForPosition(currentPosition, animFrame);
     }
 
     void Update()
@@ -73,6 +48,8 @@ public class PlayerMovement : MonoBehaviour
         if (isFalling)
         {
             transform.position += Vector3.down * fallSpeed * Time.deltaTime;
+            transform.Rotate(Vector3.forward, 360f * Time.deltaTime); 
+            AnimateSprite();
             return;
         }
 
@@ -80,7 +57,6 @@ public class PlayerMovement : MonoBehaviour
         {
             isFalling = true;
             isFrozen = true;
-            isMoving = false;
             return;
         }
 
@@ -89,67 +65,85 @@ public class PlayerMovement : MonoBehaviour
             HandleInput();
             MovePlayer();
         }
+
+        AnimateSprite(); 
     }
 
     private void HandleInput()
     {
-       // if (isMoving) return;
-
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
         {
-            switch (currentPosition)
+            if (currentPosition == PlayerPosition.Middle)
             {
-                case PlayerPosition.Middle:
-                    MoveToPosition(PlayerPosition.Right, rightPosition);
-                    break;
-                case PlayerPosition.Left:
-                    MoveToPosition(PlayerPosition.Middle, middlePosition);
-                    break;
+                SetTarget(PlayerPosition.Left, leftPosition);
+            }
+            else if (currentPosition == PlayerPosition.Right)
+            {
+                SetTarget(PlayerPosition.Middle, middlePosition);
             }
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
         {
-            switch (currentPosition)
+            if (currentPosition == PlayerPosition.Middle)
             {
-                case PlayerPosition.Middle:
-                    MoveToPosition(PlayerPosition.Left, leftPosition);
-                    break;
-                case PlayerPosition.Right:
-                    MoveToPosition(PlayerPosition.Middle, middlePosition);
-                    break;
+                SetTarget(PlayerPosition.Right, rightPosition);
+            }
+            else if (currentPosition == PlayerPosition.Left)
+            {
+                SetTarget(PlayerPosition.Middle, middlePosition);
             }
         }
+  
     }
 
-    private void MoveToPosition(PlayerPosition newPosition, Vector3 position)
+    private void SetTarget(PlayerPosition newPos, Vector3 pos)
     {
-        currentPosition = newPosition;
-        targetPosition = position;
-        isMoving = true;
-
-        spriteRenderer.sprite = newPosition switch
-        {
-            PlayerPosition.Left => config.leftSprite,
-            PlayerPosition.Right => config.rightSprite,
-            _ => config.middleSprite
-        };
+        currentPosition = newPos;
+        targetPosition = pos;
+        animFrame = 0;
+        animTimer = 0f;
+        SetSpriteForPosition(currentPosition, animFrame);
     }
 
     private void MovePlayer()
     {
-        if (isMoving && !isFrozen)
-        {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                targetPosition,
-                moveSpeed * Time.deltaTime
-            );
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
-            if (Vector3.Distance(transform.position, targetPosition) < 0.001f)
-            {
-                transform.position = targetPosition;
-                isMoving = false;
-            }
+        if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+        {
+            transform.position = targetPosition;
+        }
+    }
+
+    private void AnimateSprite()
+    {
+        Sprite[] sprites = GetSpritesForPosition(currentPosition);
+        if (sprites == null || sprites.Length == 0) return;
+
+        animTimer += Time.deltaTime;
+        if (animTimer >= animationFrameRate)
+        {
+            animTimer = 0f;
+            animFrame = (animFrame + 1) % sprites.Length;
+            spriteRenderer.sprite = sprites[animFrame];
+        }
+    }
+
+    private void SetSpriteForPosition(PlayerPosition pos, int frame)
+    {
+        Sprite[] sprites = GetSpritesForPosition(pos);
+        if (sprites != null && sprites.Length > 0)
+            spriteRenderer.sprite = sprites[Mathf.Clamp(frame, 0, sprites.Length - 1)];
+    }
+
+    private Sprite[] GetSpritesForPosition(PlayerPosition pos)
+    {
+        switch (pos)
+        {
+            case PlayerPosition.Left: return config.leftSprites;
+            case PlayerPosition.Right: return config.rightSprites;
+            case PlayerPosition.Middle: return config.middleSprites;
+            default: return null;
         }
     }
 
@@ -162,24 +156,14 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void FreezePlayer()
-    {
-        isFrozen = true;
-        isMoving = false;
-    }
-
-    public void UnfreezePlayer()
-    {
-        isFrozen = false;
-    }
-
+    public void FreezePlayer() { isFrozen = true; }
+    public void UnfreezePlayer() { isFrozen = false; }
     public void SavePosition()
     {
         PlayerPrefs.SetFloat("PlayerX", transform.position.x);
         PlayerPrefs.SetFloat("PlayerY", transform.position.y);
         PlayerPrefs.SetFloat("PlayerZ", transform.position.z);
     }
-
     public void LoadPosition()
     {
         if (PlayerPrefs.HasKey("PlayerX"))
@@ -190,7 +174,6 @@ public class PlayerMovement : MonoBehaviour
                 PlayerPrefs.GetFloat("PlayerZ")
             );
             transform.position = savedPos;
-            UpdateCurrentPositionBasedOnLocation();
         }
     }
 }

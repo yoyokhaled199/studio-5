@@ -7,8 +7,8 @@ public class ThornSpawner : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private GameObject thornPrefab;
-    [SerializeField] private float spawnInterval = 2f;
-    [SerializeField] private float minSpawnInterval = 0.5f;
+    [SerializeField] private float spawnInterval = 1.2f;
+    [SerializeField] private float minSpawnInterval = 0.2f;
     [SerializeField] private float thornLifetime = 5f;
 
     [Header("Spawn Positions")]
@@ -28,13 +28,12 @@ public class ThornSpawner : MonoBehaviour
     private ObjectPool<GameObject> thornPool;
     private List<GameObject> activeThorns = new List<GameObject>();
     private Coroutine spawnCoroutine;
+    private bool thornsStopped = false;
 
     void Start()
     {
         if (thornPrefab == null)
-        {
             return;
-        }
 
         InitializePool();
         StartSpawning();
@@ -69,59 +68,76 @@ public class ThornSpawner : MonoBehaviour
 
     void StartSpawning()
     {
+        thornsStopped = false;
         if (spawnCoroutine != null)
             StopCoroutine(spawnCoroutine);
-
         spawnCoroutine = StartCoroutine(SpawnRoutine());
     }
 
     IEnumerator SpawnRoutine()
     {
-        yield return new WaitForSeconds(1f);
-
-        while (true)
+        yield return new WaitForSeconds(0.5f);
+        while (!thornsStopped)
         {
             if (GameManager.Instance != null && !GameManager.Instance.isGameOver && spawnPositions.Length > 0)
             {
-                SpawnThorn();
+                UpdateSpawnInterval();
+                SpawnThorns();
             }
-
             yield return new WaitForSeconds(spawnInterval);
         }
     }
 
-    void SpawnThorn()
+    void UpdateSpawnInterval()
+    {
+        if (GameManager.Instance == null) return;
+        float speed = GameManager.Instance.GameSpeed;
+        spawnInterval = Mathf.Max(minSpawnInterval, 1.2f - (speed * 0.18f));
+    }
+
+    void SpawnThorns()
     {
         if (thornPool == null || spawnPositions.Length == 0) return;
 
-        GameObject thorn = thornPool.Get();
-        int posIndex = Random.Range(0, spawnPositions.Length);
-        thorn.transform.position = transform.position + spawnPositions[posIndex];
+        int thornsThisSpawn = Random.Range(1, 3);
+        List<int> availablePositions = new List<int>();
+        for (int i = 0; i < spawnPositions.Length; i++)
+            availablePositions.Add(i);
 
-        SpriteRenderer renderer = thorn.GetComponent<SpriteRenderer>();
-        if (renderer != null)
+        int count = Mathf.Min(thornsThisSpawn, availablePositions.Count);
+        for (int i = 0; i < count; i++)
         {
-            switch (posIndex)
-            {
-                case 0:
-                    if (leftThornSprites.Length > 0)
-                        renderer.sprite = leftThornSprites[Random.Range(0, leftThornSprites.Length)];
-                    break;
-                case 1:
-                    if (middleThornSprites.Length > 0)
-                        renderer.sprite = middleThornSprites[Random.Range(0, middleThornSprites.Length)];
-                    break;
-                case 2:
-                    if (rightThornSprites.Length > 0)
-                        renderer.sprite = rightThornSprites[Random.Range(0, rightThornSprites.Length)];
-                    break;
-                default:
-                    renderer.sprite = null;
-                    break;
-            }
-        }
+            int randIndex = Random.Range(0, availablePositions.Count);
+            int posIndex = availablePositions[randIndex];
+            availablePositions.RemoveAt(randIndex);
 
-        StartCoroutine(ReturnThornAfterDelay(thorn, thornLifetime));
+            GameObject thorn = thornPool.Get();
+            thorn.transform.position = transform.position + spawnPositions[posIndex];
+
+            SpriteRenderer renderer = thorn.GetComponent<SpriteRenderer>();
+            if (renderer != null)
+            {
+                switch (posIndex)
+                {
+                    case 0:
+                        if (leftThornSprites.Length > 0)
+                            renderer.sprite = leftThornSprites[Random.Range(0, leftThornSprites.Length)];
+                        break;
+                    case 1:
+                        if (middleThornSprites.Length > 0)
+                            renderer.sprite = middleThornSprites[Random.Range(0, middleThornSprites.Length)];
+                        break;
+                    case 2:
+                        if (rightThornSprites.Length > 0)
+                            renderer.sprite = rightThornSprites[Random.Range(0, rightThornSprites.Length)];
+                        break;
+                    default:
+                        renderer.sprite = null;
+                        break;
+                }
+            }
+            StartCoroutine(ReturnThornAfterDelay(thorn, thornLifetime));
+        }
     }
 
     IEnumerator ReturnThornAfterDelay(GameObject thorn, float delay)
@@ -133,17 +149,7 @@ public class ThornSpawner : MonoBehaviour
     public void ReturnThorn(GameObject thorn)
     {
         if (thorn != null && thornPool != null && thorn.activeSelf)
-        {
             thornPool.Release(thorn);
-        }
-    }
-
-    public void HandleGameRestart()
-    {
-        foreach (var thorn in activeThorns.ToArray())
-            ReturnThorn(thorn);
-
-        StartSpawning();
     }
 
     public void DecreaseSpawnInterval(float amount)
@@ -151,8 +157,30 @@ public class ThornSpawner : MonoBehaviour
         spawnInterval -= amount;
         if (spawnInterval < minSpawnInterval)
             spawnInterval = minSpawnInterval;
-
         StartSpawning();
+    }
+
+    public void HandleGameRestart()
+    {
+        foreach (var thorn in activeThorns.ToArray())
+            ReturnThorn(thorn);
+        StartSpawning();
+    }
+
+    public void StopAllThornsOnCollision()
+    {
+        if (thornsStopped) return;
+        thornsStopped = true;
+
+        if (spawnCoroutine != null)
+            StopCoroutine(spawnCoroutine);
+
+        foreach (var thornObj in activeThorns)
+        {
+            Thorn thornScript = thornObj.GetComponent<Thorn>();
+            if (thornScript != null)
+                thornScript.Freeze();
+        }
     }
 
     void OnDestroy()

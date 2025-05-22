@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95a1a81513c50422da7ed6f87fcadde4, type: 3}
   m_Name: PlayerConfig_worm
   m_EditorClassIdentifier: 
-  middleSprite: {fileID: -5348974160857761915, guid: c58649dc8bbe5f54e88a15b688ba47b1, type: 3}
-  rightSprite: {fileID: -4345969612696422427, guid: 358f2fdcb4accfc409e5d8e5013b4bc8, type: 3}
-  leftSprite: {fileID: -2208510542369132325, guid: f2a5352a8590f294e87b4e9aec2594a8, type: 3}
+  middleSprites:
+  - {fileID: -5348974160857761915, guid: c58649dc8bbe5f54e88a15b688ba47b1, type: 3}
+  rightSprites:
+  - {fileID: -4345969612696422427, guid: 358f2fdcb4accfc409e5d8e5013b4bc8, type: 3}
+  - {fileID: -1486672481693305442, guid: a1a5ec026768ba34fb897a91a2b0eb42, type: 3}
+  leftSprites:
+  - {fileID: -2208510542369132325, guid: f2a5352a8590f294e87b4e9aec2594a8, type: 3}
+  - {fileID: -8646513494607316183, guid: ffa08078e1a08f247a950275e8b78896, type: 3}

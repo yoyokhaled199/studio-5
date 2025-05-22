@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95a1a81513c50422da7ed6f87fcadde4, type: 3}
   m_Name: PlayerConfig_ant
   m_EditorClassIdentifier: 
-  middleSprite: {fileID: -8127879004084611981, guid: 5f2860239604bc045bc039502d4064ef, type: 3}
-  rightSprite: {fileID: -4345969612696422427, guid: ca71cef4efeda8c44b54898ff9c38afd, type: 3}
-  leftSprite: {fileID: -2208510542369132325, guid: fb1368205898c314f913c02cec058553, type: 3}
+  middleSprites:
+  - {fileID: -8127879004084611981, guid: 5f2860239604bc045bc039502d4064ef, type: 3}
+  - {fileID: -6104124883913110390, guid: c5c0c280f2b11624a9bbd72b7bb6ffcf, type: 3}
+  - {fileID: -7981417386050130848, guid: 9e4668281d86eab4083f50272c93f790, type: 3}
+  rightSprites:
+  - {fileID: 4348259631468166856, guid: a1754d6051beb484ca348bbddc725964, type: 3}
+  - {fileID: -1916217038095117083, guid: 141136c9789daa94fafeb82a628dcc53, type: 3}
+  leftSprites:
+  - {fileID: 1772512966389510690, guid: c958850ef51f9244a9ab9b96e154be68, type: 3}
+  - {fileID: -7798702130107589380, guid: 2b0c141f391f4724883a2fc36a65a788, type: 3}

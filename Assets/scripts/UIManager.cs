@@ -5,11 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    [Header("واجهة اللعب")]
     [SerializeField] private TextMeshProUGUI mileCounterText;
     [SerializeField] private TextMeshProUGUI highScoreText;
 
-    [Header("واجهة نهاية اللعبة")]
     [SerializeField] private TextMeshProUGUI finalScoreText;
     [SerializeField] private GameObject gameOverPanel;
 
@@ -38,6 +36,11 @@ public class UIManager : MonoBehaviour
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
+
+        if (mileCounterText != null)
+            mileCounterText.gameObject.SetActive(true);
+        if (highScoreText != null)
+            highScoreText.gameObject.SetActive(true);
     }
 
     private void Update()
@@ -78,6 +81,11 @@ public class UIManager : MonoBehaviour
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
 
+        if (mileCounterText != null)
+            mileCounterText.gameObject.SetActive(true);
+        if (highScoreText != null)
+            highScoreText.gameObject.SetActive(true);
+
         SaveHighScore();
     }
 
@@ -106,12 +114,17 @@ public class UIManager : MonoBehaviour
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
+
+        if (mileCounterText != null)
+            mileCounterText.gameObject.SetActive(true);
+        if (highScoreText != null)
+            highScoreText.gameObject.SetActive(true);
     }
 
     private void UpdateMileText()
     {
         if (mileCounterText != null)
-            mileCounterText.text = ArabicFixer.Fix($"{miles:F1} ميل");
+            mileCounterText.text = ArabicFixer.Fix($" ميل: {miles:F1}");
     }
 
     private void UpdateHighScoreText()

@@ -6,14 +6,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [Header("Game Settings")]
     [SerializeField] private float gameSpeed = 0.8f;
     [SerializeField] private float maxGameSpeed = 3.0f;
     [SerializeField] private float speedIncreaseAmount = 0.2f;
     [SerializeField] private float difficultyIncreaseInterval = 10f;
     [SerializeField] private KeyCode restartKey = KeyCode.R;
 
-    [Header("Game State")]
     public bool isGameOver { get; private set; }
 
     private Player player;
